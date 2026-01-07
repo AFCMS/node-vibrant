@@ -1,22 +1,14 @@
-import type { Palette } from "@vibrant/color";
-import { BasicPipeline } from "@vibrant/core";
-import type { ImageData, ImageOptions } from "@vibrant/image";
-import { DefaultGenerator } from "@vibrant/generator-default";
-import { MMCQ } from "@vibrant/quantizer-mmcq";
-import type { Sharp } from "sharp";
+import sharp from "sharp";
+import { applyFilters } from "./filters";
+import { generateDefaultPalette } from "./generator-default";
+import { mmcq } from "./mmcq";
+import { resizeBilinear } from "./resize";
+import type { Palette, Filter } from "./color";
+import type { ImageData, SharpVibrantOptions } from "./types";
+import { Swatch } from "./color";
 
-const sharpPipeline = new BasicPipeline()
-	.filter.register(
-		"default",
-		(r: number, g: number, b: number, a: number) =>
-			a >= 125 && !(r > 250 && g > 250 && b > 250),
-	)
-	.quantizer.register("mmcq", MMCQ)
-	.generator.register("default", DefaultGenerator);
-
-export interface SharpVibrantOptions extends Partial<ImageOptions> {
-	colorCount?: number;
-}
+const defaultFilter: Filter = (r, g, b, a) =>
+	a >= 125 && !(r > 250 && g > 250 && b > 250);
 
 const DEFAULT_OPTIONS: Required<SharpVibrantOptions> = {
 	colorCount: 64,
@@ -31,72 +23,55 @@ const getScaleRatio = (
 ) => {
 	let ratio = 1;
 
-	if (opts.maxDimension > 0) {
+	if (opts.maxDimension && opts.maxDimension > 0) {
 		const maxSide: number = Math.max(width, height);
 		if (maxSide > opts.maxDimension) {
 			ratio = opts.maxDimension / maxSide;
 		}
-	} else if (opts.quality > 0) {
+	} else if (opts.quality && opts.quality > 0) {
 		ratio = 1 / opts.quality;
 	}
 
 	return ratio < 1 ? ratio : 1;
 };
 
-const getSharpImageData = async (
-	image: Sharp,
+const loadSharpData = async (
+	source: sharp.Sharp,
 	opts: SharpVibrantOptions,
 ): Promise<ImageData> => {
+	const image = source.clone();
 	const metadata = await image.metadata();
 	if (!metadata.width || !metadata.height) {
 		throw new Error("Invalid image: missing dimensions");
 	}
 
 	const ratio = getScaleRatio(metadata.width, metadata.height, opts);
+	const raw = await image.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+	const base: ImageData = {
+		data: raw.data,
+		width: raw.info.width,
+		height: raw.info.height,
+	};
+
+	if (ratio >= 1) return base;
+
 	const targetWidth = Math.max(1, Math.round(metadata.width * ratio));
 	const targetHeight = Math.max(1, Math.round(metadata.height * ratio));
-
-	const base = image.clone().ensureAlpha();
-
-	const pipeline =
-		ratio < 1
-			? base.resize(targetWidth, targetHeight, {
-					fit: "fill",
-					kernel: "cubic",
-				})
-			: base;
-
-	const { data, info } = await pipeline
-		.raw()
-		.toBuffer({ resolveWithObject: true });
-
-	return {
-		data,
-		width: info.width,
-		height: info.height,
-	};
+	return resizeBilinear(base, targetWidth, targetHeight);
 };
 
 export const getPaletteFromSharp = async (
-	image: Sharp,
+	image: sharp.Sharp,
 	options: SharpVibrantOptions = {},
 ): Promise<Palette> => {
 	const opts = { ...DEFAULT_OPTIONS, ...options };
-	const imageData = await getSharpImageData(image, opts);
-	const result = await sharpPipeline.process(imageData, {
-		filters: ["default"],
-		quantizer: {
-			name: "mmcq",
-			options: { colorCount: opts.colorCount },
-		},
-		generators: ["default"],
-	});
+	const imageData = await loadSharpData(image, opts);
 
-	const palette = result.palettes.default;
-
-	if (!palette) {
-		throw new Error("Failed to generate palette from sharp image");
-	}
+	const filtered = applyFilters(imageData, [defaultFilter]);
+	const swatches = mmcq(filtered.data, { colorCount: opts.colorCount });
+	const palette = generateDefaultPalette(swatches);
 
 	return palette;
 };
+
+export { Swatch, rgbDiff, rgbToHex } from "./color";

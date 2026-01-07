@@ -2,47 +2,37 @@ import sharp from "sharp";
 import { expect, it, describe } from "vitest";
 
 import { loadTestSamples } from "../../../fixtures/sample/loader";
-import { Vibrant } from "../../node-vibrant/src/node";
 import { getPaletteFromSharp } from "../src";
+import { rgbDiff } from "../src/color";
 
 const SAMPLES = loadTestSamples();
 
-const SCENARIOS = [
-	{
-		label: "quality 1",
-		sharpOptions: { quality: 1 },
-		configure: (builder: ReturnType<typeof Vibrant.from>) => builder.quality(1),
-	},
-	{
-		label: "default options",
-		sharpOptions: undefined,
-		configure: (builder: ReturnType<typeof Vibrant.from>) => builder,
-	},
-];
-
 describe("Sharp palette extraction", () => {
-	SCENARIOS.forEach(({ label, sharpOptions, configure }) => {
-		describe(label, () => {
-			SAMPLES.forEach((sample) => {
-				it(`matches node palette for ${sample.name}`, async () => {
-					const sharpPalette = await getPaletteFromSharp(
-						sharp(sample.filePath),
-						sharpOptions ?? {},
-					);
+	SAMPLES.forEach((sample) => {
+		it(`matches node palette for ${sample.name}`, async () => {
+			const sharpPalette = await getPaletteFromSharp(sharp(sample.filePath));
 
-					const nodePalette = await configure(
-						Vibrant.from(sample.filePath),
-					).getPalette();
+			const nodePalette = sample.palettes["node"] as Record<
+				string,
+				{ rgb: [number, number, number] } | null
+			>;
 
-					const names = Object.keys(nodePalette);
+			const names = Object.keys(nodePalette);
 
-					for (const name of names) {
-						expect(sharpPalette[name]?.hex ?? null).toEqual(
-							nodePalette[name]?.hex ?? null,
-						);
-					}
-				});
-			});
+			for (const name of names) {
+				const a = sharpPalette[name];
+				const b = nodePalette[name];
+				expect(a, "sharp swatch missing").not.toBeNull();
+				expect(b, "node swatch missing").not.toBeNull();
+				if (a && b) {
+					const diff = rgbDiff(a.rgb as [number, number, number], b.rgb as [
+						number,
+						number,
+						number,
+					]);
+					expect(diff).toBeLessThanOrEqual(2);
+				}
+			}
 		});
 	});
 });

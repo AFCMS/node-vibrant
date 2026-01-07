@@ -274,18 +274,6 @@ importers:
 
   packages/vibrant-image-sharp:
     dependencies:
-      '@vibrant/core':
-        specifier: ^4.0.0
-        version: link:../vibrant-core
-      '@vibrant/generator-default':
-        specifier: ^4.0.2
-        version: link:../vibrant-generator-default
-      '@vibrant/image':
-        specifier: ^4.0.0
-        version: link:../vibrant-image
-      '@vibrant/quantizer-mmcq':
-        specifier: ^4.0.0
-        version: link:../vibrant-quantizer-mmcq
       sharp:
         specifier: ^0.33.5
         version: 0.33.5
