@@ -310,6 +310,40 @@ importers:
         specifier: ^6.0.5
         version: 6.0.6(@types/node@22.10.2)(jiti@2.4.1)(terser@5.37.0)(yaml@2.7.0)
 
+  packages/vibrant-sharp:
+    dependencies:
+      '@vibrant/core':
+        specifier: ^4.0.0
+        version: link:../vibrant-core
+      '@vibrant/generator-default':
+        specifier: ^4.0.2
+        version: link:../vibrant-generator-default
+      '@vibrant/image':
+        specifier: ^4.0.0
+        version: link:../vibrant-image
+      '@vibrant/quantizer-mmcq':
+        specifier: ^4.0.0
+        version: link:../vibrant-quantizer-mmcq
+      sharp:
+        specifier: ^0.33.5
+        version: 0.33.5
+    devDependencies:
+      '@tanstack/config':
+        specifier: ^0.15.0
+        version: 0.15.0(@types/node@18.19.68)(esbuild@0.24.2)(eslint@9.17.0(jiti@2.4.1))(rollup@4.28.1)(typescript@5.6.3)(vite@6.0.6(@types/node@18.19.68)(jiti@2.4.1)(terser@5.37.0)(yaml@2.7.0))
+      '@types/node':
+        specifier: ^18.15.3
+        version: 18.19.68
+      '@vibrant/color':
+        specifier: ^4.0.0
+        version: link:../vibrant-color
+      vite:
+        specifier: ^6.0.5
+        version: 6.0.6(@types/node@18.19.68)(jiti@2.4.1)(terser@5.37.0)(yaml@2.7.0)
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.8(@types/node@18.19.68)(@vitest/browser@2.1.8)(jsdom@25.0.1)(msw@2.6.8(@types/node@18.19.68)(typescript@5.6.3))(terser@5.37.0)
+
   packages/vibrant-types:
     devDependencies:
       '@tanstack/config':
@@ -12170,7 +12204,6 @@ snapshots:
       '@img/sharp-wasm32': 0.33.5
       '@img/sharp-win32-ia32': 0.33.5
       '@img/sharp-win32-x64': 0.33.5
-    optional: true
 
   shebang-command@1.2.0:
     dependencies:
