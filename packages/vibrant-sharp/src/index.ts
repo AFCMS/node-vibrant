@@ -65,13 +65,15 @@ class SharpImage extends ImageBase {
 		return this._height;
 	}
 
-	resize(targetWidth: number, targetHeight: number, _ratio: number): void {
+	resize(
+		_targetWidth: number,
+		_targetHeight: number,
+		_ratio: number,
+	): void {
 		// For sharp, resize is a no-op since we handle it differently
 		// The image is already loaded at this point, but we can update dimensions
 		// if needed. In practice, the scaleDown is handled by the Vibrant class
 		// before calling getImageData.
-		void targetWidth;
-		void targetHeight;
 	}
 
 	getPixelCount(): number {
