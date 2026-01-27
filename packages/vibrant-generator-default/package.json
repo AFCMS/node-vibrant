@@ -1,6 +1,6 @@
 {
 	"name": "@vibrant/generator-default",
-	"version": "4.0.3",
+	"version": "4.0.4",
 	"description": "Default generator that generates the original vibrant palette",
 	"author": "crutchcorn",
 	"license": "MIT",
@@ -25,8 +25,8 @@
 		"test:build": "publint --strict"
 	},
 	"dependencies": {
-		"@vibrant/color": "^4.0.0",
-		"@vibrant/generator": "^4.0.0"
+		"@vibrant/color": "^4.0.4",
+		"@vibrant/generator": "^4.0.4"
 	},
 	"devDependencies": {
 		"@tanstack/vite-config": "^0.4.3",

@@ -1,6 +1,6 @@
 {
 	"name": "@vibrant/quantizer",
-	"version": "4.0.0",
+	"version": "4.0.4",
 	"description": "Helper and typings for writing a vibrant quantizer",
 	"author": "crutchcorn",
 	"license": "MIT",
@@ -25,9 +25,9 @@
 		"test:build": "publint --strict"
 	},
 	"dependencies": {
-		"@vibrant/color": "^4.0.0",
-		"@vibrant/image": "^4.0.0",
-		"@vibrant/types": "^4.0.0"
+		"@vibrant/color": "^4.0.4",
+		"@vibrant/image": "^4.0.4",
+		"@vibrant/types": "^4.0.4"
 	},
 	"devDependencies": {
 		"@tanstack/vite-config": "^0.4.3",
