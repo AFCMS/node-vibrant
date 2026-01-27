@@ -49,10 +49,10 @@
 	"devDependencies": {
 		"@tanstack/config": "^0.15.0",
 		"@vibrant/color": "^4.0.0",
-		"@vitest/browser": "^2.1.8",
+		"@vitest/browser": "^2.1.9",
 		"playwright": "^1.49.1",
 		"vite": "^6.0.5",
-		"vitest": "^2.1.8"
+		"vitest": "^2.1.9"
 	},
 	"type": "module",
 	"types": "dist/esm/throw.d.ts",
